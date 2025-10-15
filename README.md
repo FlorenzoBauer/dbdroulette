@@ -1,70 +1,62 @@
-# Getting Started with Create React App
+# DBD Roulette 🎮
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![GitHub release](https://img.shields.io/github/v/release/florenzobauer/dbdroulette)](https://github.com/florenzobauer/dbdroulette/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue.svg)](https://github.com/florenzobauer/dbdroulette/releases)
 
-## Available Scripts
+A cross-platform desktop application that generates random Dead by Daylight loadouts to spice up your gameplay experience!
 
-In the project directory, you can run:
+![DBD Roulette Screenshot](https://via.placeholder.com/800x400/1a1a2e/ffffff?text=DBD+Roulette+Screenshot)
 
-### `npm start`
+## ✨ Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **🎯 Random Killer Selection** - Spin to get a random killer to play
+- **🔪 Killer Perk Builds** - Themed perk builds (Speed, Stealth, Hex, Info, etc.)
+- **🏃 Survivor Perk Builds** - Strategic survivor builds (Gens-Rushing, Chase, Healing, etc.)
+- **🔄 Auto-Updater** - Automatically checks for and installs updates
+- **🎨 Beautiful UI** - Dark theme with smooth animations
+- **🌍 Cross-Platform** - Works on Windows, macOS, and Linux
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Build Types Available
 
-### `npm test`
+**Killer Builds:** Speed, Stealth, Gens-Slowing, Gen-Damage, Chase, Hex, Info, Meme, End-Game, Vaulting, Random
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Survivor Builds:** Speed, Stealth, Gens-Rushing, Chase, Boon, Info, Conviction, Healing, Breakout, Meme, Random
 
-### `npm run build`
+## 📥 Download
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Get the latest release from the [Releases Page](https://github.com/florenzobauer/dbdroulette/releases)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### System Requirements
+- **Windows:** Windows 10 or newer
+- **macOS:** macOS 10.14 (Mojave) or newer
+- **Linux:** Most modern distributions
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🚀 How to Use
 
-### `npm run eject`
+1. **Download** the application for your platform
+2. **Launch** DBD Roulette
+3. **Spin the Wheels:**
+   - **Killer Wheel:** Get a random killer
+   - **Killer Perks:** Get a themed perk build
+   - **Survivor Perks:** Get a strategic survivor build
+4. **Play** with your new random loadout!
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🛠️ For Developers
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Prerequisites
+- Node.js 16+ 
+- npm or yarn
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Installation & Development
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+# Clone the repository
+git clone https://github.com/florenzobauer/dbdroulette.git
+cd dbdroulette
 
-## Learn More
+# Install dependencies
+npm install
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+# Run in development mode
+npm run electron-dev
