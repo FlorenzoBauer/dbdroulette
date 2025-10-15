@@ -1,0 +1,76 @@
+.update-screen {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.update-container {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 40px;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 2px solid #e94560;
+  min-width: 400px;
+}
+
+.update-container h1 {
+  color: #e94560;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.update-status {
+  margin: 30px 0;
+}
+
+.status-message {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  min-height: 1.5em;
+}
+
+.progress-container {
+  width: 100%;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(45deg, #e94560, #f39c12);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.continue-button {
+  background: linear-gradient(45deg, #e94560, #f39c12);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  padding: 12px 25px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.continue-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(233, 69, 96, 0.3);
+}
+
+.version-info {
+  margin-top: 20px;
+  color: #ccc;
+  font-size: 0.9em;
+}
