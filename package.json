@@ -1,6 +1,6 @@
 {
   "name": "dbdroulette",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
@@ -33,7 +33,7 @@
     "electron": "electron .",
     "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
     "dist": "npm run build && electron-builder",
-    "dist-publish": "npm run build && electron-builder --publish=always"
+    "dist-publish": "npm run build && electron-builder --win --x64 --publish=always"
   },
   "eslintConfig": {
     "extends": [
@@ -61,8 +61,8 @@
     "wait-on": "^9.0.1"
   },
   "build": {
-    "appId": "com.florenzobauer.dbdroulette",
-    "productName": "DBD Roulette",
+    "appId": "com.florenzobauer.trialrandomizer",
+    "productName": "Trial Randomizer",
     "directories": {
       "output": "dist"
     },
@@ -76,7 +76,9 @@
       "releaseType": "release"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "sign": false,
+      "publisherName": "florenzobauer"
     }
   }
 }
