@@ -1,23 +1,90 @@
 import React, { useState, useEffect } from 'react';
 import UpdateScreen from './components/UpdateScreen';
 import './App.css';
-import './data';
 import { killers, killerPerks, survivorPerks, survivorBuildThemes, killerBuildThemes } from './data';
-
 
 function App() {
   const [showUpdateScreen, setShowUpdateScreen] = useState(true);
+  const [updateStatus, setUpdateStatus] = useState('checking');
+  const [updateProgress, setUpdateProgress] = useState(0);
   const [isDev, setIsDev] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line no-unused-vars
-    const { ipcRenderer } = window.require('electron');
-    setIsDev(process.env.NODE_ENV === 'development');
+    // Determine environment
+    const devMode = window.location.protocol === 'http:';
+    setIsDev(devMode);
     
-    // In development, skip update screen
-    if (process.env.NODE_ENV === 'development') {
+    // Set up auto-updater event listeners
+    if (window.electronAPI) {
+      window.electronAPI.onUpdateChecking(() => {
+        setUpdateStatus('checking');
+      });
+      
+      window.electronAPI.onUpdateAvailable(() => {
+        setUpdateStatus('available');
+      });
+      
+      window.electronAPI.onUpdateNotAvailable(() => {
+        setUpdateStatus('not-available');
+        setTimeout(() => setShowUpdateScreen(false), 1000);
+      });
+      
+      window.electronAPI.onUpdateDownloading(() => {
+        setUpdateStatus('downloading');
+      });
+      
+      window.electronAPI.onUpdateProgress((event, progressObj) => {
+        setUpdateProgress(progressObj.percent);
+      });
+      
+      window.electronAPI.onUpdateDownloaded(() => {
+        setUpdateStatus('downloaded');
+      });
+      
+      window.electronAPI.onUpdateError(() => {
+        setUpdateStatus('error');
+        setTimeout(() => setShowUpdateScreen(false), 2000);
+      });
+      
+      window.electronAPI.onUpdateTimeout(() => {
+        setUpdateStatus('timeout');
+        setTimeout(() => setShowUpdateScreen(false), 1000);
+      });
+      
+      window.electronAPI.onUpdateSkipped(() => {
+        setUpdateStatus('skipped');
+        setShowUpdateScreen(false);
+      });
+
+      // Check for updates in production
+      if (!devMode) {
+        setTimeout(() => {
+          window.electronAPI.checkForUpdates();
+        }, 500);
+      } else {
+        // In development, skip update screen immediately
+        setShowUpdateScreen(false);
+      }
+    } else {
+      // Fallback for development without Electron
+      setIsDev(true);
       setShowUpdateScreen(false);
     }
+
+    // Cleanup function to remove listeners
+    return () => {
+      if (window.electronAPI) {
+        const events = [
+          'update-checking', 'update-available', 'update-not-available',
+          'update-downloading', 'update-progress', 'update-downloaded',
+          'update-error', 'update-timeout', 'update-skipped'
+        ];
+        
+        events.forEach(event => {
+          window.electronAPI.removeAllListeners(event);
+        });
+      }
+    };
   }, []);
 
   const handleUpdateComplete = () => {
@@ -53,11 +120,9 @@ function App() {
 
     const themePerks = survivorBuildThemes[buildType] || [];
     
-    // Always pick 4 random perks from the theme
     if (themePerks.length >= 4) {
       return getRandomPerks(themePerks, 4);
     } else {
-      // If not enough theme perks, fill with random perks from the full pool
       const remainingPerks = getRandomPerks(
         survivorPerks.filter(p => !themePerks.includes(p)), 
         4 - themePerks.length
@@ -71,16 +136,11 @@ function App() {
       return getRandomPerks(killerPerks);
     }
     
-    
-    // Define killer build themes with specific perks
-    
     const themePerks = killerBuildThemes[buildType] || [];
     
-    // Always pick 4 random perks from the theme
     if (themePerks.length >= 4) {
       return getRandomPerks(themePerks, 4);
     } else {
-      // If not enough theme perks, fill with random perks from the full pool
       const remainingPerks = getRandomPerks(
         killerPerks.filter(p => !themePerks.includes(p)), 
         4 - themePerks.length
@@ -138,8 +198,13 @@ function App() {
     }, 100);
   };
 
-   if (showUpdateScreen && !isDev) {
-    return <UpdateScreen onUpdateComplete={handleUpdateComplete} />;
+  // Show UpdateScreen in production, main app in development
+  if (showUpdateScreen && !isDev) {
+    return <UpdateScreen 
+      updateStatus={updateStatus} 
+      updateProgress={updateProgress}
+      onUpdateComplete={handleUpdateComplete} 
+    />;
   }
 
   return (
@@ -178,7 +243,6 @@ function App() {
               {isKillerBuildSpinning ? 'Spinning...' : 'Spin Perks'}
             </button>
             
-            {/* Killer Perks Display */}
             {selectedKillerPerks.length > 0 && (
               <div className="perks-container">
                 <h4>Perks:</h4>
@@ -205,7 +269,6 @@ function App() {
               {isSurvivorBuildSpinning ? 'Spinning...' : 'Spin Perks'}
             </button>
             
-            {/* Survivor Perks Display */}
             {selectedSurvivorPerks.length > 0 && (
               <div className="perks-container">
                 <h4>Perks:</h4>

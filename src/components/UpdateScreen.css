@@ -1,28 +1,57 @@
 .update-screen {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
-  align-items: center;
   justify-content: center;
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 9999;
 }
 
 .update-container {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 40px;
-  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 2px solid #e94560;
-  min-width: 400px;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 500px;
+  width: 90%;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .update-container h1 {
-  color: #e94560;
-  margin-bottom: 30px;
-  font-size: 2.5em;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  color: #2d3748;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.update-container h1::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  margin: 10px auto;
+  border-radius: 2px;
 }
 
 .update-status {
@@ -30,47 +59,241 @@
 }
 
 .status-message {
-  font-size: 1.2em;
+  font-size: 1.2rem;
+  color: #4a5568;
   margin-bottom: 20px;
-  min-height: 1.5em;
+  font-weight: 500;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 }
 
+/* Progress Bar Styles */
 .progress-container {
   width: 100%;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 12px;
+  background: #e2e8f0;
   border-radius: 10px;
   overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 20px 0;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(45deg, #e94560, #f39c12);
+  background: linear-gradient(90deg, #48bb78, #38a169);
   border-radius: 10px;
   transition: width 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Status-specific styling */
+.status-checking .status-message {
+  color: #d69e2e;
+}
+
+.status-available .status-message {
+  color: #3182ce;
+  animation: pulse 2s infinite;
+}
+
+.status-downloading .status-message {
+  color: #38a169;
+}
+
+.status-downloaded .status-message {
+  color: #38a169;
+  animation: successPulse 1.5s infinite;
+}
+
+.status-error .status-message {
+  color: #e53e3e;
+}
+
+.status-not-available .status-message,
+.status-timeout .status-message,
+.status-skipped .status-message {
+  color: #718096;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Continue Button */
 .continue-button {
-  background: linear-gradient(45deg, #e94560, #f39c12);
-  border: none;
-  border-radius: 25px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
-  padding: 12px 25px;
-  font-size: 1em;
-  font-weight: bold;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1rem;
+  border-radius: 25px;
   cursor: pointer;
-  margin-top: 20px;
   transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  margin-top: 10px;
 }
 
 .continue-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(233, 69, 96, 0.3);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
+.continue-button:active {
+  transform: translateY(0);
+}
+
+.continue-button:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Version Info */
 .version-info {
-  margin-top: 20px;
-  color: #ccc;
-  font-size: 0.9em;
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+  color: #718096;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Loading spinner for checking state */
+.status-checking .status-message::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e2e8f0;
+  border-top: 2px solid #d69e2e;
+  border-radius: 50%;
+  margin-right: 10px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Success icon for downloaded state */
+.status-downloaded .status-message::before {
+  content: '✓';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: #38a169;
+  color: white;
+  border-radius: 50%;
+  margin-right: 10px;
+  line-height: 24px;
+  font-weight: bold;
+  animation: bounceIn 0.5s ease;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Error icon for error state */
+.status-error .status-message::before {
+  content: '!';
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: #e53e3e;
+  color: white;
+  border-radius: 50%;
+  margin-right: 10px;
+  line-height: 24px;
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .update-container {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+  
+  .update-container h1 {
+    font-size: 2rem;
+  }
+  
+  .status-message {
+    font-size: 1.1rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .update-container {
+    background: rgba(45, 55, 72, 0.95);
+    color: #e2e8f0;
+  }
+  
+  .update-container h1 {
+    color: #f7fafc;
+  }
+  
+  .status-message {
+    color: #e2e8f0;
+  }
+  
+  .progress-container {
+    background: #4a5568;
+  }
+  
+  .version-info {
+    border-top-color: #4a5568;
+    color: #a0aec0;
+  }
 }

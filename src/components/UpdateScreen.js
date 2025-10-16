@@ -1,64 +1,114 @@
 import React, { useState, useEffect } from 'react';
 import './UpdateScreen.css';
 
-const UpdateScreen = ({ onUpdateComplete }) => {
-  const [status, setStatus] = useState('checking');
-  const [progress, setProgress] = useState(0);
+const UpdateScreen = ({ updateStatus, updateProgress, onUpdateComplete }) => {
+  const [status, setStatus] = useState(updateStatus || 'checking');
+  const [progress, setProgress] = useState(updateProgress || 0);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Set up IPC listeners for update events
-    const { ipcRenderer } = window.require('electron');
+    setStatus(updateStatus);
+  }, [updateStatus]);
+
+  useEffect(() => {
+    setProgress(updateProgress);
+  }, [updateProgress]);
+
+  useEffect(() => {
+    console.log('UpdateScreen mounted - status:', status);
     
-    const listeners = {
-      'update-checking': () => setStatus('checking'),
-      'update-available': () => setStatus('available'),
-      'update-not-available': () => {
-        setStatus('not-available');
-        setTimeout(() => onUpdateComplete(), 1000);
-      },
-      'update-downloading': () => setStatus('downloading'),
-      'update-progress': (event, progressObj) => {
-        setProgress(Math.round(progressObj.percent));
-      },
-      'update-downloaded': () => setStatus('downloaded'),
-      'update-error': (event, errorMsg) => {
-        setStatus('error');
-        setError(errorMsg);
-        setTimeout(() => onUpdateComplete(), 3000);
-      },
-      'update-timeout': () => {
-        setStatus('timeout');
-        setTimeout(() => onUpdateComplete(), 1000);
-      },
-      'update-skipped': () => {
-        setStatus('skipped');
-        setTimeout(() => onUpdateComplete(), 1000);
-      }
-    };
+    if (window.electronAPI) {
+      console.log('Setting up update listeners in UpdateScreen');
+      
+      const updateHandlers = {
+        'update-checking': () => {
+          console.log('Update checking in UpdateScreen');
+          setStatus('checking');
+        },
+        'update-available': () => {
+          console.log('Update available in UpdateScreen');
+          setStatus('available');
+        },
+        'update-not-available': () => {
+          console.log('No update available in UpdateScreen');
+          setStatus('not-available');
+          setTimeout(() => onUpdateComplete(), 1500);
+        },
+        'update-downloading': () => {
+          console.log('Update downloading in UpdateScreen');
+          setStatus('downloading');
+        },
+        'update-progress': (event, progressObj) => {
+          console.log('Download progress in UpdateScreen:', progressObj.percent);
+          setProgress(Math.round(progressObj.percent));
+        },
+        'update-downloaded': () => {
+          console.log('Update downloaded in UpdateScreen');
+          setStatus('downloaded');
+          // Auto-restart after 3 seconds
+          setTimeout(() => {
+            if (window.electronAPI && window.electronAPI.quitAndInstall) {
+              window.electronAPI.quitAndInstall();
+            }
+          }, 3000);
+        },
+        'update-error': (event, errorMsg) => {
+          console.log('Update error in UpdateScreen:', errorMsg);
+          setStatus('error');
+          setError(errorMsg);
+        },
+        'update-timeout': () => {
+          console.log('Update timeout in UpdateScreen');
+          setStatus('timeout');
+          setTimeout(() => onUpdateComplete(), 1500);
+        },
+        'update-skipped': () => {
+          console.log('Update skipped in UpdateScreen');
+          setStatus('skipped');
+          setTimeout(() => onUpdateComplete(), 1000);
+        }
+      };
 
-    // Add all listeners
-    Object.entries(listeners).forEach(([channel, handler]) => {
-      ipcRenderer.on(channel, handler);
-    });
-
-    // Check for updates on component mount
-    ipcRenderer.invoke('check-for-updates');
-
-    // Set timeout for update check (5 seconds)
-    const timeout = setTimeout(() => {
-      if (status === 'checking') {
-        ipcRenderer.invoke('skip-update');
-      }
-    }, 5000);
-
-    return () => {
-      // Cleanup listeners
-      Object.keys(listeners).forEach(channel => {
-        ipcRenderer.removeAllListeners(channel);
+      // Register all event listeners using electronAPI
+      Object.entries(updateHandlers).forEach(([event, handler]) => {
+        const methodName = `on${event.charAt(0).toUpperCase() + event.slice(1).replace('-', '')}`;
+        if (window.electronAPI[methodName]) {
+          window.electronAPI[methodName](handler);
+        }
       });
-      clearTimeout(timeout);
-    };
+
+      // Set timeout for update check (8 seconds)
+      const timeout = setTimeout(() => {
+        if (status === 'checking') {
+          console.log('Update check timeout - skipping');
+          window.electronAPI.skipUpdate();
+        }
+      }, 8000);
+
+      return () => {
+        console.log('Cleaning up UpdateScreen listeners');
+        if (window.electronAPI && window.electronAPI.removeAllListeners) {
+          const events = [
+            'update-checking', 'update-available', 'update-not-available',
+            'update-downloading', 'update-progress', 'update-downloaded',
+            'update-error', 'update-timeout', 'update-skipped'
+          ];
+          
+          events.forEach(event => {
+            try {
+              window.electronAPI.removeAllListeners(event);
+            } catch (error) {
+              console.log('Error removing listener:', error);
+            }
+          });
+        }
+        clearTimeout(timeout);
+      };
+    } else {
+      // Fallback: if no electronAPI, just continue after delay
+      console.log('No electronAPI in UpdateScreen - continuing');
+      setTimeout(() => onUpdateComplete(), 1000);
+    }
   }, [status, onUpdateComplete]);
 
   const getStatusMessage = () => {
@@ -66,38 +116,45 @@ const UpdateScreen = ({ onUpdateComplete }) => {
       case 'checking':
         return 'Checking for updates...';
       case 'available':
-        return 'Update available! Downloading...';
+        return 'Update available! Preparing download...';
       case 'not-available':
-        return 'You have the latest version!';
+        return 'You\'re up to date!';
       case 'downloading':
         return `Downloading update... ${progress}%`;
       case 'downloaded':
-        return 'Update downloaded! Restarting...';
+        return 'Update complete! Restarting app...';
       case 'error':
-        return `Update error: ${error}`;
+        return `Update failed: ${error}`;
       case 'timeout':
-        return 'Update check timed out. Continuing...';
+        return 'Connection timeout. Starting app...';
       case 'skipped':
-        return 'Update skipped. Continuing...';
+        return 'Starting application...';
       default:
         return 'Checking for updates...';
     }
   };
 
   return (
-    <div className="update-screen">
+    <div className={`update-screen status-${status}`}>
       <div className="update-container">
-        <h1>🎮 DBD Roulette 🎮</h1>
+        <h1>🎮 Trial Randomizer 🎮</h1>
         <div className="update-status">
           <div className="status-message">{getStatusMessage()}</div>
+          
           {(status === 'checking' || status === 'downloading') && (
             <div className="progress-container">
               <div 
                 className="progress-bar" 
-                style={{ width: `${status === 'downloading' ? progress : 100}%` }}
+                style={{ 
+                  width: `${status === 'downloading' ? progress : 100}%`,
+                  background: status === 'checking' 
+                    ? 'linear-gradient(90deg, #d69e2e, #b7791f)' 
+                    : 'linear-gradient(90deg, #48bb78, #38a169)'
+                }}
               ></div>
             </div>
           )}
+          
           {status === 'error' && (
             <button 
               className="continue-button"
@@ -107,6 +164,7 @@ const UpdateScreen = ({ onUpdateComplete }) => {
             </button>
           )}
         </div>
+        
         <div className="version-info">
           Version {process.env.REACT_APP_VERSION || '1.0.0'}
         </div>
