@@ -1,10 +1,10 @@
 {
   "name": "dbdroulette",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
-  "description": "DBD Roulette - Random Dead by Daylight loadouts",
+  "description": "Trial Randomizer - Random loadouts",
   "author": {
     "name": "florenzobauer",
     "email": "myemail@email.com"

@@ -145,8 +145,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>🎮 DBD Roulette 🎮</h1>
-        <p>Spin for your next Dead by Daylight loadout!</p>
+        <h1>🎮 Trial Randomizer 🎮</h1>
+        <p>Spin for your next loadout!</p>
         
         <div className="roulette-container">
           {/* Killer Wheel */}
