@@ -11,7 +11,7 @@ export const killers = [
 export const killerPerks = [
     'A Nurse\'s Calling', 'Agitation', "Alien Instinct", "All-Shaking Thunder", "Awakened Awareness", 'Bamboozle', 'Barbecue & Chili', "Batteries Included", 'Beast of Prey',
     'Bitter Murmur', 'Blood Echo', 'Blood Warden', 'Bloodhound', 'Brutal Strength', 'Call of Brine', 'Corrupt Intervention', 'Coulrophobia', 'Coup de Grace', 'Cruel Limits', 
-    'Dark Arrogance', 'Dark Devotion', 'Darkness Revealed', 'Dead Man\s Switch', 'Deadlock', 'Deathbound', 'Deerstalker', 'Discordance', 'Dissolution', 'Distressing', 
+    'Dark Arrogance', 'Dark Devotion', 'Darkness Revealed', 'Dead Man\'s Switch', 'Deadlock', 'Deathbound', 'Deerstalker', 'Discordance', 'Dissolution', 'Distressing', 
     'Dominance', 'Dragon\'s Grip', 'Dying Light', 'Enduring', 'Eruption', 'Fire Up', 'Forced Hesitation', 'Forced Penance', 'Forever Entwined', 'Franklin\'s Demise',
     'Friends Til the End', 'Furtive Chase', 'Game Afoot', 'Gearhead', 'Genetic Limits', 'Grim Embrace', 'Haywire', 'Help Wanted', 'Hex: Devour Hope', 'Hex: Face the Darkness',
     'Hex: Thrill of the Hunt', 'Hex: Haunted Grounds', 'Hex: Pentimento', 'Hex: Blood Favor', 'Hex: Retribution','Hex: Crowd Control','Hex: Third Seal', 'Hex: Huntress Lullaby',

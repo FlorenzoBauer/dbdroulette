@@ -10,7 +10,7 @@ function App() {
   const [isDev, setIsDev] = useState(false);
 
   useEffect(() => {
-    // Check if we're in development mode
+    // eslint-disable-next-line no-unused-vars
     const { ipcRenderer } = window.require('electron');
     setIsDev(process.env.NODE_ENV === 'development');
     

@@ -76,9 +76,7 @@
       "releaseType": "release"
     },
     "win": {
-      "target": "nsis",
-      "sign": false,
-      "publisherName": "florenzobauer"
+      "target": "nsis"
     }
   }
 }
