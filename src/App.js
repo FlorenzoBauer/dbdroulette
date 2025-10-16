@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import UpdateScreen from './components/UpdateScreen';
 import './App.css';
+import './data';
+import { killers, killerPerks, survivorPerks, survivorBuildThemes, killerBuildThemes } from './data';
+
 
 function App() {
   const [showUpdateScreen, setShowUpdateScreen] = useState(true);
@@ -20,62 +23,6 @@ function App() {
   const handleUpdateComplete = () => {
     setShowUpdateScreen(false);
   };
-
-  //Actual app content 
-  const killers = [
-    'Trapper', 'Wraith', 'Hillbilly', 'Nurse', 'Huntress', 'Shape', 'Hag',
-    'Doctor', 'Cannibal', 'Nightmare', 'Pig', 'Clown', 'Spirit', 'Legion',
-    'Plague', 'Ghost Face', 'Demogorgon', 'Oni', 'Deathslinger', 'Executioner',
-    'Blight', 'Twins', 'Trickster', 'Nemesis', 'Cenobite', 'Artist', 'Onryō',
-    'Dredge', 'Mastermind', 'Knight', 'Skull Merchant', 'Xenomorph', 'Good Guy'
-  ];
-
-  const killerPerks = [
-    'Barbecue & Chilli', 'Hex: Ruin', 'Hex: Undying', 'Pop Goes the Weasel',
-    'Corrupt Intervention', 'Scourge Hook: Pain Resonance', 'No Way Out',
-    'Deadlock', 'Save the Best for Last', 'Play With Your Food', 'Tinkerer',
-    'Discordance', 'Thanatophobia', 'Dying Light', 'Bamboozle', 'Brutal Strength',
-    'Enduring', 'Spirit Fury', 'A Nurse\'s Calling', 'Agitation', 'Monitor & Abuse',
-    'Overcharge', 'Unnerving Presence', 'Hex: Devour Hope', 'Hex: Thrill of the Hunt',
-    'Hex: Haunted Ground', 'Blood Warden', 'Fire Up', 'Beast of Prey', 'Territorial Imperative',
-    'Predator', 'Shadowborn', 'Lightborn', 'Franklin\'s Demise', 'Iron Grasp',
-    'Remember Me', 'Blood Echo', 'Zanshin Tactics', 'Nemesis', 'Gearhead',
-    'Coulrophobia', 'Infectious Fright', 'Forced Penance', 'Trail of Torment',
-    'Deathbound', 'Dark Devotion', 'I\'m All Ears', 'Thrilling Tremors',
-    'Furtive Chase', 'Starstruck', 'Hex: Blood Favor', 'Hex: Retribution',
-    'Hoarder', 'Oppression', 'Coup de Grâce', 'Nowhere to Hide', 'Call of Brine',
-    'Merciless Storm', 'Septic Touch', 'Grim Embrace', 'Lethal Pursuer',
-    'Darkness Revealed', 'Dissolution', 'Forced Hesitation', 'Game Afoot',
-    'Hubris', 'Rapid Brutality', 'Superior Anatomy', 'Machine Learning',
-    'Thwack!', 'Leverage', 'Made for This', 'Scavenger', 'Wiretap'
-  ];
-
-  const survivorPerks = [
-    'Dead Hard', 'Decisive Strike', 'Borrowed Time', 'Self-Care',
-    'Spine Chill', 'Iron Will', 'Adrenaline', 'Balanced Landing',
-    'Sprint Burst', 'Lithe', 'Quick & Quiet', 'Dance With Me',
-    'Windows of Opportunity', 'Prove Thyself', 'Botany Knowledge',
-    'Empathy', 'Kindred', 'Alert', 'Dark Sense', 'Deja Vu',
-    'Hope', 'No One Left Behind', 'We\'ll Make It', 'We\'re Gonna Live Forever',
-    'Bond', 'Leader', 'Open-Handed', 'Up the Ante', 'Ace in the Hole',
-    'Plunderer\'s Instinct', 'Slippery Meat', 'Small Game', 'This Is Not Happening',
-    'Urban Evasion', 'Unbreakable', 'Saboteur', 'Breakdown', 'Buckle Up',
-    'Mettle of Man', 'Flip-Flop', 'Power Struggle', 'Tenacity',
-    'Blood Pact', 'Desperate Measures', 'For the People', 'Guardian',
-    'Off the Record', 'Soul Guard', 'Any Means Necessary', 'Autodidact',
-    'Better Together', 'Breakout', 'Built to Last', 'Corrective Action',
-    'Distortion', 'Diversion', 'Fixated', 'Flashbang',
-    'Fogwise', 'Hyperfocus', 'Inner Healing', 'Inner Strength',
-    'Overzealous', 'Parental Guidance', 'Poised', 'Potential Energy',
-    'Reactive Healing', 'Red Herring', 'Renewal', 'Repressed Alliance',
-    'Residual Manifest', 'Rookie Spirit', 'Smash Hit', 'Stake Out',
-    'Stormborn', 'Teamwork: Power of Two', 'Teamwork: Collective Stealth', 'Vigil',
-    'Visionary', 'Wake Up!', 'Wiretap', 'Background Player',
-    'Chemical Trap', 'Dramaturgy', 'Friendly Competition', 'Head On',
-    'Hex: Pentimento', 'Low Profile', 'Object of Obsession', 'Plot Twist',
-    'Premonition', 'Resurgence', 'Solidarity', 'Streetwise',
-    'Technician', 'Unburied', 'Visionary', 'Breakdown'
-  ];
 
   const survivorBuildTypes = ['Tunneling', 'Stealth', 'Gens-Rushing', 'Chase', 'Boon', 'Info', 'Conviction', 'Healing', 'Breakout', 'Meme', 'Random'];
   const killerBuildTypes = ["Speed", "Vaulting", "Stealth", "Gens-Slowing", "Gen-Damage", "End-Game", "Basement", "Hex", "Info", "Meme", "Random"];
@@ -104,21 +51,6 @@ function App() {
       return getRandomPerks(survivorPerks);
     }
 
-    // Define survivor build themes with specific perks
-    
-      const survivorBuildThemes = {
-      'Tunneling': ['Decisive Strike', 'Dramaturgy', 'Off The Record', 'Unbreakable', 'Overcome', 'Wicked', 'Deliverance', 'Shoulder the Burden', 'Borrowed Time', 'Head On', 'Moment of Glory', 'Second Wind', 'Pick your own Exhaust', 'Resurgence', 'Slippery Meat', 'Power Struggle', 'Flip Flop', 'Unbreakable', 'Buckle Up'],
-      'Stealth': ['Distortion', 'Parental Guidance', 'Off the Record', 'Dance With Me', 'Ghost Notes', 'Iron Will', 'Cut Loose', 'Quick & Quiet', 'Urban Evasion', 'Fixated', 'Light-footed', 'Lucky Star', 'Low Profile', 'Lucky Break', 'Lightweight', 'Plot Twist', 'Calm Spirit', 'Diversion', 'Deception'],
-      'Gens-Rushing': ['Stakeout', 'Weaving Spiders', 'Built To Last', 'HyperFocus', 'Bardic Inspiration', 'Prove Thyself', 'Leader', 'One, Two, Three', 'Resilience', 'Potential Energy', 'Technician', 'Fast Track', 'Friendly Competition', 'Overzealous', 'Deadline', 'Repressed Alliance'],
-      'Chase': ['Finesse', 'Resilience', 'Windows of Opportunity', 'Lithe','Adrenaline','Balanced Landing', 'Sprint Burst', 'Dead Hard', 'Chemical Trap', 'Hope', 'Vigil', 'Fixated', 'Last Stand', 'Made for This', 'Overcome', 'Quick Gambit', 'Exulation', 'Champion of Light', 'Smash Hit'],
-      'Boon': ['Circle Of Healing', 'Exponential', 'Dark Theory', 'Shadow Step', 'Illumination'],
-      'Info': ['Deja Vu', 'Detective\'s Hunch', 'Wiretap', 'Object of Obsession', 'Alert', 'Kindred', 'Empathy', 'Bond', 'Clairvoyance', 'Dark Sense', 'Fogwise', 'Inner Focus', 'Tracherous Crows', 'Left Behind', 'Lucky Star', 'Premonition', 'Visionary', 'Wake Up!', 'Rookie Spirit', 'Plunderer\'s Instinct', 'Small Game', 'Still Light', 'Trouble Shooter', 'Better Together'],
-      'Conviction': ['Conviction', 'Soul Guard', 'Plot twist', 'Unbreakable', 'Boon: Exponential', 'Tenacity', 'Flip-Flop', 'Power Struggle', 'No Mither'],
-      'Healing': ['Auto-Didact', 'One, Two, Three', 'We\'ll Make it', 'Pharmacy', 'Self-Care', 'Empathy', 'Botany Knowledge', 'Clean Break', 'Inner Healing', 'Do No Harm', 'Empathic Connection', 'Blood Pact', 'Reactive Healing', 'Resilience', 'Resurgence', 'Solidarity', 'Strength in Shadows','We\'re Gonna Live Forever'],
-      'Breakout': ['Breakout', 'Mettle Of Man', 'Self-Care', 'Background Player', 'For the People', 'Sabatuer', 'Champion of Light', 'Any Means Necessary', 'Flashbang'],
-      'Meme': ['FlashBang', 'Mirrored Illusion', 'Scene Partner', 'Head On', 'Boiled Over', 'No Mither', 'Any Means Necessary', 'Bardic Inspiration', 'One, Two, Three', 'Object of Obsession', 'Diversion', 'For the People', 'Blast Mine', 'Dramaturgy', 'Plot Twist', 'Up the Ante', 'Ace in the Hole', 'Open-Handed']
-    };
-
     const themePerks = survivorBuildThemes[buildType] || [];
     
     // Always pick 4 random perks from the theme
@@ -141,18 +73,6 @@ function App() {
     
     
     // Define killer build themes with specific perks
-    const killerBuildThemes = {
-      'Speed': ['Batteries Included', 'Furtive Chase', 'Machine Learning', 'Rapid Brutality', 'Unbound'],
-      'Vaulting': ['Bamboozle', 'Dark Arrogance', 'Super Anatomy', 'Fire Up', 'Unbound'],
-      'Stealth': ['Hex: Plaything', 'Unforeseen', 'Furtive Chase', 'Trail of Torment', 'Dark Devotion', 'Insidious'],
-      'Gens-Slowing': ['Dying Light', 'Thanatophobia', 'Ruin', 'Hex: Pentimento', 'Dead Man\'s Switch'],
-      'Gen-Damage': ['Pop', 'Surge', 'Eruption', 'Scourge Hook: Pain Resonance', 'Call of Brine', 'Oppression'],
-      "End-Game": ['Remember Me', 'Blood Warden', 'No-ed', 'Haywire', 'No Way Out', 'Terminus', 'Ranchor','None Are Free'],
-      'Basement': ['Insidious', 'Mad Grit', 'Agitation', 'Brutal Strength', 'Enduring', 'Iron Grasp', 'Monstrous Shrine', 'Territorial Imperative'],
-      'Hex': ['Devour Hope', 'Face the Darkness', 'Thrill of the Hunt', 'Haunted Grounds', 'Pentimento', 'Blood Favor', 'Retribution','Crowd Control', 'Third Seal', 'Huntress Lullaby', 'Nothing But Misery', 'Overature of Doom', 'Ruin', 'Two Can Play', 'Undying', 'Wretched Fate', 'No Ed', 'Plaything'],
-      'Info': ['Reveal the Darkness', 'Discordance', 'Barbecue', 'Nurse\'s Calling', 'Nowhere to Hide', 'Bitter Murmur', 'Infectious Fright', 'Lethal Pursuer', 'Floods of Rage', 'Iron Maiden', 'Predator', 'I\'m All Ears', 'Retribution', 'Nemesis', 'Deer Stalker', 'Lightborn', 'Weave Attunement', 'Wandering Eye', 'Zanshin Tactics', 'Twack!', 'Jagged Compass', 'Alien Instinct', 'Dragon\'s Grip', 'Gearhead', 'Friends til the End', 'Grim Embrace', 'Ranchor'],
-      'Meme': ['Spirit Fury', 'Lightborn', 'Franklin\'s Demise', 'Phantom Fear', 'Distressing', 'Coup de Grace', 'Merciless Storm', 'No Quarter']
-    };
     
     const themePerks = killerBuildThemes[buildType] || [];
     
