@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './UpdateScreen.css';
+import packageJson from '../../package.json';
 
 const UpdateScreen = ({ updateStatus, updateProgress, onUpdateComplete }) => {
   const [status, setStatus] = useState(updateStatus || 'checking');
@@ -164,7 +165,7 @@ const UpdateScreen = ({ updateStatus, updateProgress, onUpdateComplete }) => {
         </div>
         
         <div className="version-info">
-          Version {packageJson.version || '0.0.0 error'}
+          v{packageJson.version}
         </div>
       </div>
     </div>
