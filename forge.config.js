@@ -7,22 +7,11 @@ module.exports = {
     executableName: 'trialrandomizer',
     icon: './build/icon',
     asar: true,
+    platform: 'win32',
+    arch: 'x64'
   },
   rebuildConfig: {},
   makers: [
-    {
-      name: '@electron-forge/maker-squirrel',
-      config: {
-        name: 'trialrandomizer',
-        authors: 'florenzobauer',
-        exe: 'trialrandomizer.exe',
-        iconUrl: 'https://raw.githubusercontent.com/FlorenzoBauer/trialrandomizer/main/build/icon.ico',
-        setupIcon: './build/icon.ico',
-        loadingGif: './build/installer.gif',
-        noMsi: false,
-        remoteReleases: 'https://github.com/FlorenzoBauer/trialrandomizer'
-      },
-    },
     {
       name: '@electron-forge/maker-zip',
       platforms: ['win32'],
@@ -46,8 +35,6 @@ module.exports = {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {},
     },
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
     new FusesPlugin({
       version: FuseVersion.V1,
       [FuseV1Options.RunAsNode]: false,

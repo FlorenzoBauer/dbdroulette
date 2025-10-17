@@ -25,16 +25,17 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
-  "scripts": {
+   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron-forge start",
     "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron-forge start\"",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish"
+    "package": "electron-forge package --platform=win32 --arch=x64",
+    "make": "electron-forge make --platform=win32 --arch=x64",
+    "publish": "electron-forge publish --platform=win32 --arch=x64",
+    "clean": "rm -rf out/"
   },
   "eslintConfig": {
     "extends": [
@@ -58,46 +59,13 @@
     "@electron-forge/cli": "^7.8.0",
     "@electron-forge/maker-squirrel": "^7.8.0",
     "@electron-forge/maker-zip": "^7.8.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.8.0",
-    "@electron-forge/plugin-webpack": "^7.8.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.10.2",
+    "@electron-forge/plugin-fuses": "^7.10.2",
     "@electron-forge/publisher-github": "^7.8.0",
+    "@electron/fuses": "^1.8.0",
     "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "electron": "^38.2.2",
     "wait-on": "^9.0.1"
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "icon": "./build/icon"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "trialrandomizer",
-            "setupIcon": "./build/icon.ico",
-            "loadingGif": "./build/installer.gif"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": ["win32"]
-        }
-      ],
-      "publishers": [
-        {
-          "name": "@electron-forge/publisher-github",
-          "config": {
-            "repository": {
-              "owner": "FlorenzoBauer",
-              "name": "trialrandomizer"
-            },
-            "prerelease": false,
-            "draft": true
-          }
-        }
-      ]
-    }
   }
 }
