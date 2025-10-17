@@ -26,7 +26,7 @@ module.exports = {
           name: 'trialrandomizer'
         },
         prerelease: false,
-        draft: false
+        draft: true
       }
     }
   ],
