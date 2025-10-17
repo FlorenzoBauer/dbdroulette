@@ -4,7 +4,7 @@ import { killers, survivors, killerBuildThemes, survivorBuildThemes } from './da
 
 function App() {
   const [isDev, setIsDev] = useState(false);
-
+  const [appVersion, setAppVersion] = useState('');
   // Character selection states
   const [showCharacterSelector, setShowCharacterSelector] = useState(false);
   const [activeCharacterTab, setActiveCharacterTab] = useState('killer');
@@ -40,6 +40,7 @@ function App() {
   useEffect(() => {
     const devMode = window.location.protocol === 'http:';
     setIsDev(devMode);
+    setAppVersion(process.env.REACT_APP_VERSION || 'Error');
   }, []);
 
   // Get available perks
@@ -348,6 +349,10 @@ function App() {
           <p>This app is not affiliated with Dead by Daylight or its developers.</p>
         </div>
       </header>
+      <footer className="app-footer">
+        <p>Version {appVersion}</p>
+        <p>This app is not affiliated with Dead by Daylight or its developers.</p>
+      </footer>
     </div>
   );
 }
