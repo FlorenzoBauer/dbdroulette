@@ -166,7 +166,7 @@ const UpdateScreen = ({ updateStatus, updateProgress, onUpdateComplete }) => {
         </div>
         
         <div className="version-info">
-          Version {process.env.REACT_APP_VERSION || '1.0.0'}
+          Version {packageJson.version || '0.0.0 error'}
         </div>
       </div>
     </div>
