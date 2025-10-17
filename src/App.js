@@ -36,11 +36,10 @@ function App() {
     "Gen-Damage", "End-Game", "Basement", "Hex", "Info", "Meme", "Random"
   ];
 
-  // Detect dev mode
+  // Detect dev mode and get version via preload API
   useEffect(() => {
-    const devMode = window.location.protocol === 'http:';
-    setIsDev(devMode);
-    setAppVersion(process.env.REACT_APP_VERSION || 'Error');
+    setIsDev(window.electronAPI?.isDev || false);
+    setAppVersion(window.electronAPI?.getAppVersion() || 'Unknown');
   }, []);
 
   // Get available perks

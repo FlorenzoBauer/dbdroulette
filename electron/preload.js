@@ -1,7 +1,28 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, app } = require('electron');
+const path = require('path');
+const fs = require('fs');
 
-// Expose protected methods that allow the renderer process to use
-// the ipcRenderer without exposing the entire object
+// Function to get app version safely in dev and production
+function getAppVersion() {
+  try {
+    // In production, use app.getVersion()
+    if (process.versions.electron && !process.env.NODE_ENV) {
+      const electronApp = require('electron').app;
+      return electronApp.getVersion();
+    } else {
+      // In dev, fallback to package.json
+      const packageJsonPath = path.join(__dirname, '../package.json');
+      if (fs.existsSync(packageJsonPath)) {
+        const pkg = require(packageJsonPath);
+        return pkg.version || 'Unknown';
+      }
+    }
+  } catch (err) {
+    console.error('Failed to get app version:', err);
+  }
+  return 'Unknown';
+}
+
 contextBridge.exposeInMainWorld('electronAPI', {
   // Auto-updater events
   onUpdateChecking: (callback) => ipcRenderer.on('update-checking', callback),
@@ -17,10 +38,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Auto-updater actions
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   skipUpdate: () => ipcRenderer.invoke('skip-update'),
-  
-  // Remove event listeners - ADDED THIS
+
+  // Remove event listeners
   removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel),
-  
+
   // Environment info
-  isDev: process.env.NODE_ENV === 'development'
+  isDev: process.env.NODE_ENV === 'development',
+
+  // App version
+  getAppVersion: getAppVersion
 });
