@@ -86,7 +86,6 @@ const UpdateScreen = ({ updateStatus, updateProgress, onUpdateComplete }) => {
       }, 8000);
 
       return () => {
-        console.log('Cleaning up UpdateScreen listeners');
         if (window.electronAPI && window.electronAPI.removeAllListeners) {
           const events = [
             'update-checking', 'update-available', 'update-not-available',
@@ -106,7 +105,6 @@ const UpdateScreen = ({ updateStatus, updateProgress, onUpdateComplete }) => {
       };
     } else {
       // Fallback: if no electronAPI, just continue after delay
-      console.log('No electronAPI in UpdateScreen - continuing');
       setTimeout(() => onUpdateComplete(), 1000);
     }
   }, [status, onUpdateComplete]);

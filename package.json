@@ -1,6 +1,6 @@
 {
   "name": "trialrandomizer",
-  "version": "1.1.2",
+  "version": "1.1.1",
   "private": false,
   "main": "public/electron.js",
   "homepage": "./",
