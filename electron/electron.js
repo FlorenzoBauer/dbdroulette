@@ -87,14 +87,14 @@ function createWindow() {
     if (!isDev) {
       setTimeout(() => {
         initAutoUpdater();
-      }, 1000);
+      }, 10000);
     } else {
       // In dev mode, send update-not-available immediately to skip update screen
       setTimeout(() => {
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('update-not-available');
         }
-      }, 500);
+      }, 5000);
     }
   });
 
