@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import UpdateScreen from './components/UpdateScreen';
 import './App.css';
 import { killers, survivors, killerBuildThemes, survivorBuildThemes } from './data';
 
 function App() {
-  const [showUpdateScreen, setShowUpdateScreen] = useState(true);
-  const [updateStatus, setUpdateStatus] = useState('checking');
-  const [updateProgress, setUpdateProgress] = useState(0);
   const [isDev, setIsDev] = useState(false);
 
-  // NEW: Character selection states - exclude "Other" from initial selection
+  // Character selection states
   const [showCharacterSelector, setShowCharacterSelector] = useState(false);
   const [activeCharacterTab, setActiveCharacterTab] = useState('killer');
   const [ownedKillers, setOwnedKillers] = useState(
@@ -19,119 +15,68 @@ function App() {
     survivors.filter(s => s.name !== 'Other').map(s => s.name)
   );
 
+  // Spin + selection states
+  const [selectedKiller, setSelectedKiller] = useState('');
+  const [selectedKillerBuild, setSelectedKillerBuild] = useState('');
+  const [selectedKillerPerks, setSelectedKillerPerks] = useState([]);
+  const [selectedSurvivorBuild, setSelectedSurvivorBuild] = useState('');
+  const [selectedSurvivorPerks, setSelectedSurvivorPerks] = useState([]);
+  
+  const [isKillerSpinning, setIsKillerSpinning] = useState(false);
+  const [isKillerBuildSpinning, setIsKillerBuildSpinning] = useState(false);
+  const [isSurvivorBuildSpinning, setIsSurvivorBuildSpinning] = useState(false);
+
+  const survivorBuildTypes = [
+    'Tunneling', 'Stealth', 'Gens-Rushing', 'Chase', 'Boon', 'Info', 
+    'Conviction', 'Healing', 'Breakout', 'Meme', 'Random'
+  ];
+
+  const killerBuildTypes = [
+    "Speed", "Scourge", "Vaulting", "Stealth", "Gens-Slowing", 
+    "Gen-Damage", "End-Game", "Basement", "Hex", "Info", "Meme", "Random"
+  ];
+
+  // Detect dev mode
   useEffect(() => {
     const devMode = window.location.protocol === 'http:';
     setIsDev(devMode);
-    
-    if (window.electronAPI) {
-      window.electronAPI.onUpdateChecking(() => {
-        setUpdateStatus('checking');
-      });
-      
-      window.electronAPI.onUpdateAvailable(() => {
-        setUpdateStatus('available');
-      });
-      
-      window.electronAPI.onUpdateNotAvailable(() => {
-        setUpdateStatus('not-available');
-        setTimeout(() => setShowUpdateScreen(false), 1000);
-      });
-      
-      window.electronAPI.onUpdateDownloading(() => {
-        setUpdateStatus('downloading');
-      });
-      
-      window.electronAPI.onUpdateProgress((event, progressObj) => {
-        setUpdateProgress(progressObj.percent);
-      });
-      
-      window.electronAPI.onUpdateDownloaded(() => {
-        setUpdateStatus('downloaded');
-      });
-      
-      window.electronAPI.onUpdateError(() => {
-        setUpdateStatus('error');
-        setTimeout(() => setShowUpdateScreen(false), 2000);
-      });
-      
-      window.electronAPI.onUpdateTimeout(() => {
-        setUpdateStatus('timeout');
-        setTimeout(() => setShowUpdateScreen(false), 1000);
-      });
-      
-      window.electronAPI.onUpdateSkipped(() => {
-        setUpdateStatus('skipped');
-        setShowUpdateScreen(false);
-      });
-
-      if (!devMode) {
-        setTimeout(() => {
-          window.electronAPI.checkForUpdates();
-        }, 500);
-      } else {
-        setShowUpdateScreen(false);
-      }
-    } else {
-      setIsDev(true);
-      setShowUpdateScreen(false);
-    }
-
-    return () => {
-      if (window.electronAPI) {
-        const events = [
-          'update-checking', 'update-available', 'update-not-available',
-          'update-downloading', 'update-progress', 'update-downloaded',
-          'update-error', 'update-timeout', 'update-skipped'
-        ];
-        
-        events.forEach(event => {
-          window.electronAPI.removeAllListeners(event);
-        });
-      }
-    };
   }, []);
 
-  // UPDATED: Get available perks based on owned characters with "Other" category fallback
+  // Get available perks
   const getAvailableKillerPerks = () => {
     const ownedKillerObjects = killers.filter(k => ownedKillers.includes(k.name));
     const characterPerks = ownedKillerObjects.flatMap(k => k.perks);
-    
-    // Always include "Other" category perks
     const otherKiller = killers.find(k => k.name === 'Other');
     const otherPerks = otherKiller ? otherKiller.perks : [];
-    
     return [...new Set([...characterPerks, ...otherPerks])];
   };
 
   const getAvailableSurvivorPerks = () => {
     const ownedSurvivorObjects = survivors.filter(s => ownedSurvivors.includes(s.name));
     const characterPerks = ownedSurvivorObjects.flatMap(s => s.perks);
-    
-    // Always include "Other" category perks
     const otherSurvivor = survivors.find(s => s.name === 'Other');
     const otherPerks = otherSurvivor ? otherSurvivor.perks : [];
-    
     return [...new Set([...characterPerks, ...otherPerks])];
   };
 
-  // NEW: Character selection handlers
+  // Ownership toggles
   const toggleKillerOwnership = (killerName) => {
-    setOwnedKillers(prev => 
-      prev.includes(killerName) 
+    setOwnedKillers(prev =>
+      prev.includes(killerName)
         ? prev.filter(name => name !== killerName)
         : [...prev, killerName]
     );
   };
 
   const toggleSurvivorOwnership = (survivorName) => {
-    setOwnedSurvivors(prev => 
-      prev.includes(survivorName) 
+    setOwnedSurvivors(prev =>
+      prev.includes(survivorName)
         ? prev.filter(name => name !== survivorName)
         : [...prev, survivorName]
     );
   };
 
-  // UPDATED: Select all/none functions - exclude "Other"
+  // Select all/none
   const selectAllKillers = () => setOwnedKillers(
     killers.filter(k => k.name !== 'Other').map(k => k.name)
   );
@@ -141,68 +86,50 @@ function App() {
   );
   const selectNoSurvivors = () => setOwnedSurvivors([]);
 
-  // Helper functions to get display counts (excluding "Other")
+  // Display helpers
   const getDisplayKillers = () => killers.filter(k => k.name !== 'Other');
   const getDisplaySurvivors = () => survivors.filter(s => s.name !== 'Other');
 
-  // NEW: Updated perk functions that use available perks
-  const getRandomItem = (array) => {
-    return array[Math.floor(Math.random() * array.length)];
-  };
-
+  // Random utilities
+  const getRandomItem = (array) => array[Math.floor(Math.random() * array.length)];
   const getRandomPerks = (perkPool, count = 4) => {
     if (perkPool.length === 0) return [];
     const shuffled = [...perkPool].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, Math.min(count, perkPool.length));
   };
 
-  // UPDATED: Build perk functions with "Other" category fallback
+  // Build generators
   const getSurvivorBuildPerks = (buildType) => {
     const availablePerks = getAvailableSurvivorPerks();
-    
-    if (buildType === 'Random') {
-      return getRandomPerks(availablePerks, 4);
-    }
+    if (buildType === 'Random') return getRandomPerks(availablePerks, 4);
 
     const themePerks = survivorBuildThemes[buildType] || [];
     const availableThemePerks = themePerks.filter(perk => availablePerks.includes(perk));
-    
-    if (availableThemePerks.length >= 4) {
-      return getRandomPerks(availableThemePerks, 4);
-    } else {
-      // Get remaining perks from available pool (including "Other" category)
-      const remainingAvailablePerks = availablePerks.filter(p => !availableThemePerks.includes(p));
-      const remainingPerks = getRandomPerks(remainingAvailablePerks, 4 - availableThemePerks.length);
-      return [...availableThemePerks, ...remainingPerks];
-    }
+
+    if (availableThemePerks.length >= 4) return getRandomPerks(availableThemePerks, 4);
+
+    const remaining = availablePerks.filter(p => !availableThemePerks.includes(p));
+    return [...availableThemePerks, ...getRandomPerks(remaining, 4 - availableThemePerks.length)];
   };
 
   const getKillerBuildPerks = (buildType) => {
     const availablePerks = getAvailableKillerPerks();
-    
-    if (buildType === 'Random') {
-      return getRandomPerks(availablePerks, 4);
-    }
-    
+    if (buildType === 'Random') return getRandomPerks(availablePerks, 4);
+
     const themePerks = killerBuildThemes[buildType] || [];
     const availableThemePerks = themePerks.filter(perk => availablePerks.includes(perk));
-    
-    if (availableThemePerks.length >= 4) {
-      return getRandomPerks(availableThemePerks, 4);
-    } else {
-      // Get remaining perks from available pool (including "Other" category)
-      const remainingAvailablePerks = availablePerks.filter(p => !availableThemePerks.includes(p));
-      const remainingPerks = getRandomPerks(remainingAvailablePerks, 4 - availableThemePerks.length);
-      return [...availableThemePerks, ...remainingPerks];
-    }
+
+    if (availableThemePerks.length >= 4) return getRandomPerks(availableThemePerks, 4);
+
+    const remaining = availablePerks.filter(p => !availableThemePerks.includes(p));
+    return [...availableThemePerks, ...getRandomPerks(remaining, 4 - availableThemePerks.length)];
   };
 
-  // NEW: Updated killer spin function that only uses owned killers (excluding "Other")
+  // Spin logic
   const spinKiller = () => {
     setIsKillerSpinning(true);
     let spins = 0;
     const maxSpins = 15;
-    
     const spinInterval = setInterval(() => {
       const availableKillers = killers.filter(k => ownedKillers.includes(k.name) && k.name !== 'Other');
       if (availableKillers.length > 0) {
@@ -220,7 +147,6 @@ function App() {
     setIsKillerBuildSpinning(true);
     let spins = 0;
     const maxSpins = 15;
-    
     const spinInterval = setInterval(() => {
       const randomBuild = getRandomItem(killerBuildTypes);
       setSelectedKillerBuild(randomBuild);
@@ -237,7 +163,6 @@ function App() {
     setIsSurvivorBuildSpinning(true);
     let spins = 0;
     const maxSpins = 15;
-    
     const spinInterval = setInterval(() => {
       const randomBuild = getRandomItem(survivorBuildTypes);
       setSelectedSurvivorBuild(randomBuild);
@@ -250,34 +175,9 @@ function App() {
     }, 100);
   };
 
-  const handleUpdateComplete = () => {
-    setShowUpdateScreen(false);
-  };
-
-  const survivorBuildTypes = ['Tunneling', 'Stealth', 'Gens-Rushing', 'Chase', 'Boon', 'Info', 'Conviction', 'Healing', 'Breakout', 'Meme', 'Random'];
-  const killerBuildTypes = ["Speed", "Scourge", "Vaulting", "Stealth", "Gens-Slowing", "Gen-Damage", "End-Game", "Basement", "Hex", "Info", "Meme", "Random"];
-
-  const [selectedKiller, setSelectedKiller] = useState('');
-  const [selectedKillerBuild, setSelectedKillerBuild] = useState('');
-  const [selectedKillerPerks, setSelectedKillerPerks] = useState([]);
-  const [selectedSurvivorBuild, setSelectedSurvivorBuild] = useState('');
-  const [selectedSurvivorPerks, setSelectedSurvivorPerks] = useState([]);
-  
-  const [isKillerSpinning, setIsKillerSpinning] = useState(false);
-  const [isKillerBuildSpinning, setIsKillerBuildSpinning] = useState(false);
-  const [isSurvivorBuildSpinning, setIsSurvivorBuildSpinning] = useState(false);
-
-  if (showUpdateScreen && !isDev) {
-    return <UpdateScreen 
-      updateStatus={updateStatus} 
-      updateProgress={updateProgress}
-      onUpdateComplete={handleUpdateComplete} 
-    />;
-  }
-
   return (
     <div className="App">
-      {/* NEW: Navigation Bar */}
+      {/* Navigation Bar */}
       <nav className="navbar">
         <div className="nav-left">
           <button 
@@ -290,12 +190,9 @@ function App() {
         <div className="nav-center">
           <h1>🎮 Trial Randomizer 🎮</h1>
         </div>
-        <div className="nav-right">
-          {/* Future nav items can go here */}
-        </div>
       </nav>
 
-      {/* NEW: Character Selection Dropdown */}
+      {/* Character Selection Modal */}
       {showCharacterSelector && (
         <div className="character-selector-overlay">
           <div className="character-selector-modal">
@@ -372,7 +269,7 @@ function App() {
 
       <header className="App-header">
         <p>Spin for your next loadout!</p>
-        
+
         <div className="roulette-container">
           {/* Killer Wheel */}
           <div className="wheel-section">
@@ -387,9 +284,7 @@ function App() {
             >
               {isKillerSpinning ? 'Spinning...' : 'Spin Killer'}
             </button>
-            {ownedKillers.length === 0 && (
-              <p className="warning">No killers selected!</p>
-            )}
+            {ownedKillers.length === 0 && <p className="warning">No killers selected!</p>}
           </div>
 
           {/* Killer Perks Wheel */}
@@ -444,17 +339,13 @@ function App() {
             )}
           </div>
         </div>
-        
+
         <div className="info">
           <div className="build-types">
-            <div>
-              <strong>Killer Builds:</strong> {killerBuildTypes.join(', ')}
-            </div>
-            <div>
-              <strong>Survivor Builds:</strong> {survivorBuildTypes.join(', ')}
-            </div>
+            <div><strong>Killer Builds:</strong> {killerBuildTypes.join(', ')}</div>
+            <div><strong>Survivor Builds:</strong> {survivorBuildTypes.join(', ')}</div>
           </div>
-          <p>This app is not affiliated with Dead by Daylight or any of its developers.</p>
+          <p>This app is not affiliated with Dead by Daylight or its developers.</p>
         </div>
       </header>
     </div>
