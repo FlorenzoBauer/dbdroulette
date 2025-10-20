@@ -27,9 +27,9 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "dist": "npm run build && electron-builder",
-    "dist:win": "npm run build && electron-builder --win",
-    "dist:all": "npm run build && electron-builder -wml"
+    "dist": "npm run build && electron-builder --win",
+    "publish": "npm run build && electron-builder --win --publish=always",
+    "clean": "rm -rf build dist"
   },
   "build": {
     "appId": "com.florenzobauer.trialrandomizer",
@@ -39,10 +39,17 @@
     },
     "files": [
       "build/**/*",
-      "electron/electron.js",
-      "electron/preload.js",
-      "node_modules/**/*"
+      "electron/**/*",
+      "package.json"
     ],
+    "extraMetadata": {
+      "main": "electron/electron.js"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "FlorenzoBauer",
+      "repo": "trialrandomizer"
+    },
     "win": {
       "target": "nsis",
       "icon": "build/icon.ico"
@@ -50,14 +57,6 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "build/icon.icns"
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "build/icon.png"
     }
   },
   "eslintConfig": {

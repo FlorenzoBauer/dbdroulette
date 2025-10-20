@@ -101,15 +101,15 @@ export const survivors = [
 ];
   
 export const killerBuildThemes = {
-      'Speed': ['Batteries Included', 'Furtive Chase', 'Machine Learning', 'Rapid Brutality', 'Unbound', 'Game Afoot', 'Devour Hope', 'Shadowborn', 'No Ed', 'Play with Your Food'],
-      'Scourge': ['Scourge: Floods of Rage', 'Scourge: Gift of Pain', 'Scourge: Hangman\'s Trick', 'Scourge: Jagged Compass', 'Scourge: Monstrous Shrine', 'Scourge: Pain Resonance'],
+      'Speed': ['Batteries Included', 'Furtive Chase', 'Machine Learning', 'Rapid Brutality', 'Unbound', 'Game Afoot', 'Devour Hope', 'Shadowborn', 'Hex: No One Escapes Death', 'Play with Your Food'],
+      'Scourge': ['Scourge Hook: Floods of Rage', 'Scourge Hook: Gift of Pain', 'Scourge Hook: Hangman\'s Trick', 'Scourge Hook: Jagged Compass', 'Scourge Hook: Monstrous Shrine', 'Scourge Hook: Pain Resonance'],
       'Vaulting': ['Bamboozle', 'Dark Arrogance', 'Super Anatomy', 'Fire Up', 'Unbound', 'Dissolution', 'Cruel Limits', 'Hex: Crowd Control', 'I\'m All Ears', 'Zanshin Tactics'],
       'Stealth': ['Hex: Plaything', 'Unforeseen', 'Furtive Chase', 'Trail of Torment', 'Dark Devotion', 'Insidious', 'Beast of Prey', 'Hex: Overature of Doom', 'Tinkerer', 'Machine Learning', 'Deathbound', 'Hysteria'],
-      'Gens-Slowing': ['Dying Light', 'Thanatophobia', 'Ruin', 'Hex: Pentimento', 'Dead Man\'s Switch', 'Corrupt Intervention', 'Scourge: Gift of Pain', 'Hex: Wretched Fate', 'Deadlock', 'Grim Embrace', 'Merciless Storm', 'Thrilling Tremors', 'Hex: Huntress Lullaby'],
+      'Gens-Slowing': ['Dying Light', 'Thanatophobia', 'Ruin', 'Hex: Pentimento', 'Dead Man\'s Switch', 'Corrupt Intervention', 'Scourge Hook: Gift of Pain', 'Hex: Wretched Fate', 'Deadlock', 'Grim Embrace', 'Merciless Storm', 'Thrilling Tremors', 'Hex: Huntress Lullaby'],
       'Gen-Damage': ['Pop', 'Surge', 'Eruption', 'Scourge Hook: Pain Resonance', 'Call of Brine', 'Oppression', 'Overcharge', 'Undone'],
-      "End-Game": ['Remember Me', 'Blood Warden', 'No-ed', 'Haywire', 'No Way Out', 'Terminus', 'Ranchor','None Are Free'],
+      "End-Game": ['Remember Me', 'Blood Warden', 'Hex: No One Escapes Death', 'Haywire', 'No Way Out', 'Terminus', 'Ranchor','None Are Free'],
       'Basement': ['Insidious', 'Mad Grit', 'Agitation', 'Brutal Strength', 'Enduring', 'Iron Grasp', 'Monstrous Shrine', 'Territorial Imperative'],
-      'Hex': ['Devour Hope', 'Face the Darkness', 'Thrill of the Hunt', 'Haunted Grounds', 'Pentimento', 'Blood Favor', 'Retribution','Crowd Control', 'Third Seal', 'Huntress Lullaby', 'Nothing But Misery', 'Overature of Doom', 'Ruin', 'Two Can Play', 'Undying', 'Wretched Fate', 'No Ed', 'Plaything'],
+      'Hex': ['Devour Hope', 'Face the Darkness', 'Thrill of the Hunt', 'Haunted Grounds', 'Pentimento', 'Blood Favor', 'Retribution','Crowd Control', 'Third Seal', 'Huntress Lullaby', 'Nothing But Misery', 'Overature of Doom', 'Ruin', 'Two Can Play', 'Undying', 'Wretched Fate', 'Hex: No One Escapes Death', 'Plaything'],
       'Info': ['Reveal the Darkness', 'Discordance', 'Barbecue', 'Nurse\'s Calling', 'Nowhere to Hide', 'Bitter Murmur', 'Infectious Fright', 'Lethal Pursuer', 'Floods of Rage', 'Iron Maiden', 'Predator', 'I\'m All Ears', 'Retribution', 'Nemesis', 'Deer Stalker', 'Lightborn', 'Weave Attunement', 'Wandering Eye', 'Zanshin Tactics', 'Twack!', 'Jagged Compass', 'Alien Instinct', 'Dragon\'s Grip', 'Gearhead', 'Friends til the End', 'Grim Embrace', 'Ranchor'],
       'Meme': ['Spirit Fury', 'Lightborn', 'Franklin\'s Demise', 'Phantom Fear', 'Distressing', 'Coup de Grace', 'Merciless Storm', 'No Quarter', 'Coulrophobia', 'Dragon\'s Grip', 'Hex: Haunted Grounds', 'Hex: Face the Darkness', 'Hoarder', 'Human Greed', 'Mad Grit', 'Whispers', 'Spies from the Shadows', 'Unnerving Presence', 'Unrelenting']
     };  
