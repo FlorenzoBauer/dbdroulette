@@ -1,27 +1,4 @@
-const { contextBridge, ipcRenderer, app } = require('electron');
-const path = require('path');
-const fs = require('fs');
-
-// Function to get app version safely in dev and production
-function getAppVersion() {
-  try {
-    // In production, use app.getVersion()
-    if (process.versions.electron && !process.env.NODE_ENV) {
-      const electronApp = require('electron').app;
-      return electronApp.getVersion();
-    } else {
-      // In dev, fallback to package.json
-      const packageJsonPath = path.join(__dirname, '../package.json');
-      if (fs.existsSync(packageJsonPath)) {
-        const pkg = require(packageJsonPath);
-        return pkg.version || 'Unknown';
-      }
-    }
-  } catch (err) {
-    console.error('Failed to get app version:', err);
-  }
-  return 'Unknown';
-}
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Auto-updater events
@@ -35,9 +12,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onUpdateTimeout: (callback) => ipcRenderer.on('update-timeout', callback),
   onUpdateSkipped: (callback) => ipcRenderer.on('update-skipped', callback),
   
-  // Auto-updater actions
+  // Custom updater actions
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: (releaseData) => ipcRenderer.invoke('download-update', releaseData),
+  installUpdate: (downloadPath) => ipcRenderer.invoke('install-update', downloadPath),
   skipUpdate: () => ipcRenderer.invoke('skip-update'),
+  quitAndInstall: (downloadPath) => ipcRenderer.invoke('install-update', downloadPath),
 
   // Remove event listeners
   removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel),
@@ -46,5 +26,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   isDev: process.env.NODE_ENV === 'development',
 
   // App version
-  getAppVersion: getAppVersion
+  getAppVersion: () => {
+    try {
+      if (process.versions.electron && !process.env.NODE_ENV) {
+        const electronApp = require('electron').app;
+        return electronApp.getVersion();
+      } else {
+        const packageJson = require('../package.json');
+        return packageJson.version || 'Unknown';
+      }
+    } catch (err) {
+      return 'Unknown';
+    }
+  }
 });

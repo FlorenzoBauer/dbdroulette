@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { killers, survivors, killerBuildThemes, survivorBuildThemes } from './data';
+import UpdateScreen from './components/UpdateScreen';
 
 function App() {
-  const [isDev, setIsDev] = useState(false);
   const [appVersion, setAppVersion] = useState('');
+  const [showUpdateScreen, setShowUpdateScreen] = useState(true);
+  const [updateStatus, setUpdateStatus] = useState('checking');
+  const [updateProgress, setUpdateProgress] = useState(0);
+  
   // Character selection states
   const [showCharacterSelector, setShowCharacterSelector] = useState(false);
   const [activeCharacterTab, setActiveCharacterTab] = useState('killer');
@@ -36,11 +40,15 @@ function App() {
     "Gen-Damage", "End-Game", "Basement", "Hex", "Info", "Meme", "Random"
   ];
 
-  // Detect dev mode and get version via preload API
+  // Detect version via preload API
   useEffect(() => {
-    setIsDev(window.electronAPI?.isDev || false);
     setAppVersion(window.electronAPI?.getAppVersion() || 'Unknown');
   }, []);
+
+  // Handle update completion
+  const handleUpdateComplete = () => {
+    setShowUpdateScreen(false);
+  };
 
   // Get available perks
   const getAvailableKillerPerks = () => {
@@ -174,6 +182,17 @@ function App() {
       }
     }, 100);
   };
+
+  // Show UpdateScreen first, then main app
+  if (showUpdateScreen) {
+    return (
+      <UpdateScreen 
+        updateStatus={updateStatus}
+        updateProgress={updateProgress}
+        onUpdateComplete={handleUpdateComplete}
+      />
+    );
+  }
 
   return (
     <div className="App">

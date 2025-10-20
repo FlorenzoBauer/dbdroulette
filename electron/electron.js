@@ -1,16 +1,266 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, net } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const isDev = require('electron-is-dev');
-const { autoUpdater } = require('electron-updater');
+const https = require('https');
+
+// Replace the electron-is-dev import at the top
+let isDev = process.env.NODE_ENV === 'development' || process.defaultApp || /[\\/]electron[\\/]/.test(process.execPath);
 
 // Keep a global reference of the window object
 let mainWindow;
 let updateTimeout = null;
 
-// Auto updater events
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = true;
+class GitHubCustomUpdater {
+  constructor(mainWindow) {
+    this.mainWindow = mainWindow;
+    this.owner = 'FlorenzoBauer'; // CHANGE THIS to your GitHub username
+    this.repo = 'trialrandomizer'; // CHANGE THIS to your repository name
+    this.currentVersion = app.getVersion();
+  }
+
+  async checkForUpdates() {
+    try {
+      this.sendToRenderer('update-checking');
+      
+      const latestRelease = await this.fetchLatestRelease();
+      
+      if (this.isNewerVersion(latestRelease.tag_name)) {
+        this.sendToRenderer('update-available', latestRelease);
+      } else {
+        this.sendToRenderer('update-not-available');
+      }
+    } catch (error) {
+      console.error('Update check failed:', error);
+      this.sendToRenderer('update-error', error.message);
+    }
+  }
+
+  async fetchLatestRelease() {
+    return new Promise((resolve, reject) => {
+      const options = {
+        hostname: 'api.github.com',
+        path: `/repos/${this.owner}/${this.repo}/releases/latest`,
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Trial-Randomizer-App',
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      };
+
+      const req = https.request(options, (res) => {
+        let data = '';
+
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+
+        res.on('end', () => {
+          if (res.statusCode === 200) {
+            try {
+              const release = JSON.parse(data);
+              resolve(release);
+            } catch (parseError) {
+              reject(new Error('Failed to parse GitHub response'));
+            }
+          } else {
+            reject(new Error(`GitHub API returned ${res.statusCode}`));
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        reject(error);
+      });
+
+      req.end();
+    });
+  }
+
+  async downloadUpdate(release) {
+    try {
+      this.sendToRenderer('update-downloading');
+      
+      // Find the asset for the current platform
+      const asset = this.findPlatformAsset(release.assets);
+      if (!asset) {
+        throw new Error('No compatible download found for your platform');
+      }
+
+      const downloadPath = path.join(app.getPath('temp'), asset.name);
+      await this.downloadFile(asset.browser_download_url, downloadPath);
+      
+      this.sendToRenderer('update-downloaded', downloadPath);
+      
+    } catch (error) {
+      console.error('Download failed:', error);
+      this.sendToRenderer('update-error', error.message);
+    }
+  }
+
+  findPlatformAsset(assets) {
+    const platform = process.platform;
+    const arch = process.arch;
+    
+    // Look for platform-specific assets
+    const platformPatterns = {
+      'win32': ['win', 'windows', '.exe', 'nsis', 'setup'],
+      'darwin': ['mac', 'darwin', '.dmg', 'macos'],
+      'linux': ['linux', '.AppImage', 'appimage']
+    };
+
+    const patterns = platformPatterns[platform] || [platform];
+    
+    for (const asset of assets) {
+      const assetName = asset.name.toLowerCase();
+      if (patterns.some(pattern => assetName.includes(pattern.toLowerCase()))) {
+        return asset;
+      }
+    }
+    
+    // Fallback: return first asset if no platform-specific one found
+    return assets[0];
+  }
+
+  async downloadFile(url, filePath) {
+    return new Promise((resolve, reject) => {
+      const file = fs.createWriteStream(filePath);
+      let receivedBytes = 0;
+      let totalBytes = 0;
+
+      https.get(url, (response) => {
+        if (response.statusCode !== 200) {
+          reject(new Error(`Download failed with status ${response.statusCode}`));
+          return;
+        }
+
+        totalBytes = parseInt(response.headers['content-length'], 10);
+        
+        response.on('data', (chunk) => {
+          receivedBytes += chunk.length;
+          file.write(chunk);
+          
+          // Calculate progress
+          const progress = totalBytes > 0 ? (receivedBytes / totalBytes) * 100 : 0;
+          this.sendToRenderer('update-progress', {
+            percent: Math.round(progress),
+            transferred: receivedBytes,
+            total: totalBytes
+          });
+        });
+
+        response.on('end', () => {
+          file.end();
+          resolve();
+        });
+
+        response.on('error', (error) => {
+          file.end();
+          // Delete partial file on error
+          try {
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+            }
+          } catch (e) {
+            console.error('Failed to delete partial file:', e);
+          }
+          reject(error);
+        });
+
+      }).on('error', (error) => {
+        reject(error);
+      });
+    });
+  }
+
+  installUpdate(downloadPath) {
+    if (!fs.existsSync(downloadPath)) {
+      this.sendToRenderer('update-error', 'Downloaded file not found');
+      return;
+    }
+
+    try {
+      const { spawn } = require('child_process');
+      
+      if (process.platform === 'win32') {
+        // For Windows .exe installers
+        const child = spawn(downloadPath, ['/S'], {
+          detached: true,
+          stdio: 'ignore'
+        });
+        child.unref();
+      } else if (process.platform === 'darwin') {
+        // For macOS .dmg files
+        const child = spawn('open', [downloadPath], {
+          detached: true,
+          stdio: 'ignore'
+        });
+        child.unref();
+      } else if (process.platform === 'linux') {
+        // For Linux .AppImage - make executable and run
+        fs.chmodSync(downloadPath, 0o755);
+        const child = spawn(downloadPath, [], {
+          detached: true,
+          stdio: 'ignore'
+        });
+        child.unref();
+      }
+      
+      app.quit();
+      
+    } catch (error) {
+      console.error('Installation failed:', error);
+      this.sendToRenderer('update-error', error.message);
+    }
+  }
+
+  isNewerVersion(latestVersion) {
+    // Remove 'v' prefix if present
+    const cleanLatest = latestVersion.replace(/^v/, '');
+    const cleanCurrent = this.currentVersion.replace(/^v/, '');
+    
+    // Simple semver comparison
+    const latestParts = cleanLatest.split('.').map(Number);
+    const currentParts = cleanCurrent.split('.').map(Number);
+    
+    for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
+      const latestPart = latestParts[i] || 0;
+      const currentPart = currentParts[i] || 0;
+      
+      if (latestPart > currentPart) return true;
+      if (latestPart < currentPart) return false;
+    }
+    
+    return false; // Versions are equal
+  }
+
+  sendToRenderer(event, data = null) {
+    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+      if (data) {
+        this.mainWindow.webContents.send(event, data);
+      } else {
+        this.mainWindow.webContents.send(event);
+      }
+    }
+  }
+}
+
+let githubUpdater;
+
+function initCustomUpdater() {
+  if (githubUpdater) return;
+  
+  githubUpdater = new GitHubCustomUpdater(mainWindow);
+  
+  // Set timeout for update check (10 seconds)
+  updateTimeout = setTimeout(() => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('update-timeout');
+    }
+  }, 10000);
+
+  // Start update check
+  githubUpdater.checkForUpdates();
+}
 
 function createWindow() {
   // Create the browser window with SECURE settings
@@ -83,10 +333,10 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     
-    // Initialize auto-updater in production AFTER window is ready
+    // Initialize custom updater in production AFTER window is ready
     if (!isDev) {
       setTimeout(() => {
-        initAutoUpdater();
+        initCustomUpdater();
       }, 10000);
     } else {
       // In dev mode, send update-not-available immediately to skip update screen
@@ -111,102 +361,30 @@ function createWindow() {
   });
 }
 
-function initAutoUpdater() {
-  // Clear any existing timeout
-  if (updateTimeout) {
-    clearTimeout(updateTimeout);
-  }
-
-  // Set update check timeout
-  updateTimeout = setTimeout(() => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('update-timeout');
-    }
-  }, 10000);
-
-  autoUpdater.on('checking-for-update', () => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('update-checking');
-    }
-  });
-
-  autoUpdater.on('update-available', () => {
-    if (updateTimeout) clearTimeout(updateTimeout);
-    
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('update-available');
-      
-      // Ask user if they want to download the update
-      dialog.showMessageBox(mainWindow, {
-        type: 'info',
-        title: 'Update Available',
-        message: 'A new version of Trial Randomizer is available. Would you like to download it now?',
-        buttons: ['Download', 'Later']
-      }).then(result => {
-        if (result.response === 0) {
-          autoUpdater.downloadUpdate();
-          mainWindow.webContents.send('update-downloading');
-        } else {
-          mainWindow.webContents.send('update-skipped');
-        }
-      });
-    }
-  });
-
-  autoUpdater.on('update-not-available', () => {
-    if (updateTimeout) clearTimeout(updateTimeout);
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('update-not-available');
-    }
-  });
-
-  autoUpdater.on('download-progress', (progressObj) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('update-progress', progressObj);
-    }
-  });
-
-  autoUpdater.on('update-downloaded', () => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('update-downloaded');
-      
-      // Ask user to install the update
-      dialog.showMessageBox(mainWindow, {
-        type: 'info',
-        title: 'Update Ready',
-        message: 'Update downloaded. Application will restart to install the update.',
-        buttons: ['Restart', 'Later']
-      }).then(result => {
-        if (result.response === 0) {
-          setImmediate(() => {
-            autoUpdater.quitAndInstall();
-          });
-        }
-      });
-    }
-  });
-
-  autoUpdater.on('error', (error) => {
-    if (updateTimeout) clearTimeout(updateTimeout);
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('update-error', error.message);
-    }
-  });
-
-  // Check for updates
-  autoUpdater.checkForUpdates().catch(error => {
-    // Silent fail - user doesn't need to know about update check failures
-  });
-}
-
 // IPC handlers for update actions
 ipcMain.handle('check-for-updates', () => {
-  if (!isDev && mainWindow && !mainWindow.isDestroyed()) {
-    initAutoUpdater();
+  if (!isDev && githubUpdater && mainWindow && !mainWindow.isDestroyed()) {
+    githubUpdater.checkForUpdates();
+  }
+});
+
+ipcMain.handle('download-update', (event, releaseData) => {
+  if (githubUpdater && mainWindow && !mainWindow.isDestroyed()) {
+    githubUpdater.downloadUpdate(releaseData);
+  }
+});
+
+ipcMain.handle('install-update', (event, downloadPath) => {
+  if (githubUpdater && mainWindow && !mainWindow.isDestroyed()) {
+    githubUpdater.installUpdate(downloadPath);
   }
 });
 
 ipcMain.handle('skip-update', () => {
+  if (updateTimeout) {
+    clearTimeout(updateTimeout);
+    updateTimeout = null;
+  }
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('update-skipped');
   }
