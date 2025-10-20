@@ -1,6 +1,6 @@
 {
   "name": "trialrandomizer",
-  "version": "1.1.2",
+  "version": "1.1.1",
   "private": false,
   "main": "electron/electron.js",
   "homepage": "./",
@@ -27,7 +27,7 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
-    "dist": "npm run build && electron-builder --win",
+    "dist": "npm run build && electron-builder --win --x64",
     "publish": "npm run build && electron-builder --win --publish=always",
     "clean": "rm -rf build dist"
   },
