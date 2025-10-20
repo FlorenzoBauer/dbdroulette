@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { killers, survivors, killerBuildThemes, survivorBuildThemes } from './data';
 import UpdateScreen from './components/UpdateScreen';
+import packageJson from '../package.json';
 
 function App() {
   const [appVersion, setAppVersion] = useState('');
@@ -368,7 +369,7 @@ function App() {
         </div>
       </header>
       <footer className="app-footer">
-        <p>Version {appVersion}</p>
+        <p>Version {packageJson.version}</p>
         <p>This app is not affiliated with Dead by Daylight or its developers.</p>
       </footer>
     </div>
